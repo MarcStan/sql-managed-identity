@@ -46,7 +46,7 @@ In that case you can either add an alternative account of yours as a guest to th
 
 Or alternatively make that account the subscription owner. You should then be able to make yourself the SQL admin with your development account.
 
-Second make sure the firewall is open for your local IP (on the server firewall settings add your client IP). Later we'll also use MSI from within Azure so you can already enable `Allow Azure services and resources to access this server`.
+Second make sure the firewall is open for your local IP (on the server firewall settings add your client IP).
 
 Finally you should be able navigate to the sql database and use the query editor.
 
@@ -58,7 +58,7 @@ Before you do so you must update the [appsettings.Development.json](./SQLManaged
 
 You can simply replace the local connection string with the one from appsettings.json (using your server & database name of course).
 
-The only code change you need to do is in your [database Context](./SqlManagedIdentity/Data/ApplicationDbContext.cs) class (it requires the [AppAuthentication](https://www.nuget.org/packages/Microsoft.Azure.Services.AppAuthentication) package):
+The only code change you need to do is in your [database context](./SqlManagedIdentity/Data/ApplicationDbContext.cs) class (it requires the [AppAuthentication](https://www.nuget.org/packages/Microsoft.Azure.Services.AppAuthentication) package):
 
 ``` csharp
 var con = Database.GetDbConnection();
@@ -81,3 +81,42 @@ For Visual Studio check `Tools -> Options -> Azure Service Authentication`, else
 With the updated connection string and the SQL firewall opend up you should be able to run the project locally and have it connect to the Azure SQL database.
 
 On first signup you will have to apply the migrations again and and afterwards you will be able to signup users without ever having used the SQL password!
+
+# Run the sample in Azure with SQL database
+
+The final step is to deploy the code to an app service in Azure and run it from there.
+
+# 1. Create the infrastructure
+
+If you don't yet have a webapp you can create one (along with a free app service plan).
+
+Be sure to enable the app service managed identity by flipping the switch in the `Identity` menu to on.
+
+For maximum security you should add the app service IPs (visible in properties) to your SQL server. Alternatively you can open up the SQL server to all Azure services by flipping the `Allow Azure services and resources to access this server` switch in the SQL firewall settings.
+
+# 2. Setup SQL MSI for app service
+
+With the app service created head back into the query editor of the SQL database as we must now create a SQL user for the app service. (Unlike user accounts the managed identities for services are not created automatically inside SQL server).
+
+
+``` sql
+CREATE USER [app service name] FROM EXTERNAL PROVIDER
+ALTER ROLE db_datareader ADD MEMBER [app service name]
+ALTER ROLE db_datawriter ADD MEMBER [app service name]
+```
+
+The output of all commands will be `Query succeeded: Affected rows: 0`.
+
+If need be, you can also add [more roles](https://docs.microsoft.com/sql/relational-databases/security/authentication-access/database-level-roles#fixed-database-roles).
+
+# 3. Configure the project
+
+If you haven't done so already, update the [appsettings.json](./SqlManagedIdentity/appsettings.json) to point to your SQL server & database.
+
+# 4. Publish the project
+
+Either publish directly from Visual Studio or use the [pipeline](./azure-pipelines.yml).
+
+For the pipeline you will have to update the `$(ResourceGroupName)`, `$(AppServiceName)` and `azureSubscription` (the service connection used to deploy the function).
+
+Once published the app service should be up and running and it should establish a successful connection to the SQL database again without using any SQL password!
