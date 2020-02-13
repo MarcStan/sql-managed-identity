@@ -120,3 +120,5 @@ Either publish directly from Visual Studio or use the [pipeline](./azure-pipelin
 For the pipeline you will have to update the `$(ResourceGroupName)`, `$(AppServiceName)` and `azureSubscription` (the service connection used to deploy the function).
 
 Once published the app service should be up and running and it should establish a successful connection to the SQL database again without using any SQL password!
+
+You should now be able to log in with the same account you created when running locally (while connected to the SQL database).
