@@ -115,9 +115,7 @@ If you haven't done so already, update the [appsettings.json](./SqlManagedIdenti
 
 # 4. Publish the project
 
-Either publish directly from Visual Studio or use the [pipeline](./azure-pipelines.yml).
-
-For the pipeline you will have to update the `$(ResourceGroupName)`, `$(AppServiceName)` and `azureSubscription` (the service connection used to deploy the function).
+The simplest way to publish is directly from Visual Studio. Alternatively you can setup Github Actions to automate the deployment.
 
 Once published the app service should be up and running and it should establish a successful connection to the SQL database again without using any SQL password!
 
