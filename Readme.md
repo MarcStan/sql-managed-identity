@@ -2,7 +2,7 @@
 
 Example demonstrating how managed identity interacts with an Azure SQL database
 
-**Note:** While this sample uses local accountsI urge you to consider using an oauth provider/Azure AD as the user store for a real project. It is much more secure than managing username/password yourself and users won't have to create a new account and can instead reuse their existing accounts. This sample is purely to demonstrate having a SQL database and the respective MSI connection.
+**Note:** While this sample uses local accounts I urge you to consider using an oauth provider/Azure AD as the user store for a real project. It is much more secure than managing username/password yourself and users won't have to create a new account and can instead reuse their existing accounts. This sample is purely to demonstrate having a SQL database and the respective MSI connection.
 
 # Run the sample locally with a local db
 
